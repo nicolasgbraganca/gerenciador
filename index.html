@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Móveis & Cia — Sistema de Gestão</title>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Sans:wght@300;400;500;600&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+  <div id="toast-container"></div>
+
+  <!-- ===== LOGIN ===== -->
+  <div id="page-login">
+    <div class="login-box">
+      <div class="login-logo">Pereira<span> & </span>Alem</div>
+      <p class="login-sub">Sistema de Gestão</p>
+      <div class="form-group">
+        <label>Usuário</label>
+        <input type="text" id="login-user" placeholder="login" />
+      </div>
+      <div class="form-group">
+        <label>Senha</label>
+        <input type="password" id="login-pass" placeholder="••••••" onkeydown="if(event.key==='Enter')doLogin()" />
+      </div>
+      <button class="btn btn-primary" onclick="doLogin()">Entrar</button>
+      <div class="login-nav" style="margin-top:24px;">
+        <a onclick="showPage('catalog')">Ver catálogo público →</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== APP ===== -->
+  <div id="app">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-logo">
+        <h1>Móveis<span>&</span>Cia</h1>
+        <p>Gestão de Loja</p>
+      </div>
+      <div class="nav-section">Administração</div>
+      <a class="nav-item active" onclick="showPage('dashboard')" data-page="dashboard">
+        <span class="icon">📊</span><span>Dashboard</span>
+      </a>
+      <a class="nav-item" onclick="showPage('products')" data-page="products">
+        <span class="icon">🛋️</span><span>Produtos</span>
+      </a>
+      <a class="nav-item" onclick="showPage('sold')" data-page="sold">
+        <span class="icon">✅</span><span>Vendidos</span>
+      </a>
+      <div class="nav-section">Público</div>
+      <a class="nav-item" onclick="showPage('catalog')" data-page="catalog">
+        <span class="icon">🏪</span><span>Catálogo</span>
+      </a>
+      <div class="sidebar-footer">
+        <button class="logout-btn" onclick="doLogout()">
+          <span class="icon">🚪</span><span>Sair</span>
+        </button>
+      </div>
+    </aside>
+
+    <!-- Main -->
+    <main class="main">
+
+      <!-- DASHBOARD -->
+      <div class="page active" id="page-dashboard">
+        <div class="page-header">
+          <div>
+            <div class="page-title">Dashboard</div>
+            <div class="page-subtitle">Visão geral do negócio</div>
+          </div>
+          <button class="btn btn-primary" onclick="openModal('modal-product')">+ Novo Produto</button>
+        </div>
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-label">Produtos à venda</div>
+            <div class="stat-value" id="stat-available">0</div>
+          </div>
+          <div class="stat-card green">
+            <div class="stat-label">Lucro total (vendidos)</div>
+            <div class="stat-value" id="stat-profit">R$ 0</div>
+          </div>
+          <div class="stat-card blue">
+            <div class="stat-label">Total vendido</div>
+            <div class="stat-value" id="stat-sold-count">0</div>
+          </div>
+          <div class="stat-card red">
+            <div class="stat-label">Investimento em estoque</div>
+            <div class="stat-value" id="stat-invested">R$ 0</div>
+          </div>
+        </div>
+        <div class="page-header" style="margin-top:8px;">
+          <div class="page-title" style="font-size:1.3rem;">Produtos Recentes</div>
+        </div>
+        <div class="products-grid" id="dash-recent"></div>
+      </div>
+
+      <!-- PRODUTOS -->
+      <div class="page" id="page-products">
+        <div class="page-header">
+          <div>
+            <div class="page-title">Produtos</div>
+            <div class="page-subtitle">Gerencie seu estoque</div>
+          </div>
+          <button class="btn btn-primary" onclick="openModal('modal-product')">+ Novo Produto</button>
+        </div>
+        <div class="filter-bar">
+          <input type="text" id="search-products" placeholder="🔍 Buscar produto..." oninput="renderProducts()">
+          <select id="filter-room" onchange="renderProducts()">
+            <option value="">Todos os cômodos</option>
+          </select>
+          <select id="filter-type" onchange="renderProducts()">
+            <option value="">Todos os tipos</option>
+          </select>
+        </div>
+        <div class="products-grid" id="products-list"></div>
+      </div>
+
+      <!-- VENDIDOS -->
+      <div class="page" id="page-sold">
+        <div class="page-header">
+          <div>
+            <div class="page-title">Histórico de Vendas</div>
+            <div class="page-subtitle">Produtos vendidos e lucros</div>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Produto</th>
+                <th>Cômodo</th>
+                <th>Custo</th>
+                <th>Preço Venda</th>
+                <th>Lucro</th>
+                <th>Vendido em</th>
+              </tr>
+            </thead>
+            <tbody id="sold-list"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- CATÁLOGO PÚBLICO -->
+      <div class="page" id="page-catalog">
+        <div class="catalog-header">
+          <h1>🛋️ Móveis & Cia</h1>
+          <p>Móveis usados com qualidade e história</p>
+          <div class="catalog-contact" id="catalog-contact-info"></div>
+        </div>
+        <div class="filter-bar">
+          <input type="text" id="search-catalog" placeholder="🔍 Buscar móvel..." oninput="renderCatalog()">
+          <select id="filter-catalog-room" onchange="renderCatalog()">
+            <option value="">Todos os cômodos</option>
+          </select>
+          <select id="filter-catalog-type" onchange="renderCatalog()">
+            <option value="">Todos os tipos</option>
+          </select>
+        </div>
+        <div class="products-grid" id="catalog-list"></div>
+        <!-- Formulário de proposta -->
+        <div id="no-catalog-login" style="display:none; text-align:center; margin-top:20px;">
+          <a onclick="showLoginFromCatalog()" style="color:var(--wood); cursor:pointer; font-weight:600;">Área
+            administrativa →</a>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <!-- ===== MODALS ===== -->
+
+  <!-- PRODUTO -->
+  <div class="modal-overlay" id="modal-product">
+    <div class="modal">
+      <button class="modal-close" onclick="closeModal('modal-product')">✕</button>
+      <h2 id="modal-product-title">Novo Produto</h2>
+      <input type="hidden" id="product-id">
+      <div class="form-group">
+        <label>Nome do Produto *</label>
+        <input type="text" id="p-name" placeholder="Ex: Sofá 3 lugares retrô">
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Cômodo *</label>
+          <select id="p-room">
+            <option value="">Selecione...</option>
+            <option>Sala</option>
+            <option>Quarto</option>
+            <option>Cozinha</option>
+            <option>Escritório</option>
+            <option>Área externa</option>
+            <option>Banheiro</option>
+            <option>Outro</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Tipo *</label>
+          <select id="p-type">
+            <option value="">Selecione...</option>
+            <option>Sofá</option>
+            <option>Mesa</option>
+            <option>Cadeira</option>
+            <option>Guarda-roupa</option>
+            <option>Cama</option>
+            <option>Estante</option>
+            <option>Armário</option>
+            <option>Poltrona</option>
+            <option>Rack / Painel</option>
+            <option>Penteadeira</option>
+            <option>Escrivaninha</option>
+            <option>Outro</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Valor de Custo (R$) *</label>
+          <input type="number" id="p-cost" placeholder="0,00" step="0.01">
+        </div>
+        <div class="form-group">
+          <label>Preço de Venda (R$) *</label>
+          <input type="number" id="p-price" placeholder="0,00" step="0.01">
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Descrição</label>
+        <textarea id="p-desc" rows="3" placeholder="Estado de conservação, materiais, medidas..."></textarea>
+      </div>
+      <div class="form-group">
+        <label>Fotos do Produto *</label>
+        <div class="img-upload-area" onclick="document.getElementById('p-imgs').click()">
+          <span>📷 Clique para adicionar fotos</span>
+          <input type="file" id="p-imgs" multiple accept="image/*" onchange="handleImgs(event)">
+          <div class="img-preview" id="img-preview-list"></div>
+        </div>
+      </div>
+      <div class="form-actions">
+        <button class="btn btn-ghost" onclick="closeModal('modal-product')">Cancelar</button>
+        <button class="btn btn-primary" onclick="saveProduct()">💾 Salvar Produto</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- DETALHES PRODUTO (admin) -->
+  <div class="modal-overlay" id="modal-detail">
+    <div class="modal">
+      <button class="modal-close" onclick="closeModal('modal-detail')">✕</button>
+      <div id="modal-detail-content"></div>
+    </div>
+  </div>
+
+  <!-- PROPOSTA / VENDER (público) -->
+  <div class="modal-overlay" id="modal-propose">
+    <div class="modal">
+      <button class="modal-close" onclick="closeModal('modal-propose')">✕</button>
+      <h2>📋 Fazer Proposta / Vender</h2>
+      <div id="propose-product-info"
+        style="margin-bottom:16px; padding:14px; background:var(--bg); border-radius:10px;"></div>
+      <div class="form-group">
+        <label>Seu Nome *</label>
+        <input type="text" id="prop-name" placeholder="Nome completo">
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Telefone *</label>
+          <input type="text" id="prop-phone" placeholder="(00) 00000-0000">
+        </div>
+        <div class="form-group">
+          <label>E-mail</label>
+          <input type="email" id="prop-email" placeholder="seu@email.com">
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Tipo de proposta</label>
+        <select id="prop-type">
+          <option value="compra">Quero COMPRAR este produto</option>
+          <option value="venda">Quero VENDER um produto para a loja</option>
+        </select>
+      </div>
+      <div id="sell-extra" style="display:none;">
+        <div class="sell-section">
+          <h4>📦 Dados do seu produto (para venda à loja)</h4>
+          <div class="form-group">
+            <label>Descrição do seu produto</label>
+            <textarea id="prop-sell-desc" rows="3" placeholder="Descreva o produto que deseja vender..."></textarea>
+          </div>
+          <div class="form-group">
+            <label>Valor pretendido (R$)</label>
+            <input type="number" id="prop-sell-value" placeholder="0,00" step="0.01">
+          </div>
+          <div class="form-group">
+            <label>Foto do produto</label>
+            <div class="img-upload-area" onclick="document.getElementById('prop-sell-img').click()">
+              <span>📷 Adicionar foto</span>
+              <input type="file" id="prop-sell-img" accept="image/*" onchange="handleProposeSellImg(event)">
+              <div id="prop-sell-img-preview"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Mensagem adicional</label>
+        <textarea id="prop-msg" rows="2" placeholder="Alguma observação?"></textarea>
+      </div>
+      <div class="form-actions">
+        <button class="btn btn-ghost" onclick="closeModal('modal-propose')">Cancelar</button>
+        <button class="btn btn-primary" onclick="submitProposal()">📨 Enviar Proposta</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- PROPOSTAS (admin) -->
+  <div class="modal-overlay" id="modal-proposals">
+    <div class="modal" style="max-width:700px;">
+      <button class="modal-close" onclick="closeModal('modal-proposals')">✕</button>
+      <h2>📋 Propostas Recebidas</h2>
+      <div id="proposals-list" style="margin-top:16px;"></div>
+    </div>
+  </div>
+
+  <!-- MARCAR VENDIDO (admin) -->
+  <div class="modal-overlay" id="modal-sell">
+    <div class="modal" style="max-width:420px;">
+      <button class="modal-close" onclick="closeModal('modal-sell')">✕</button>
+      <h2>✅ Confirmar Venda</h2>
+      <input type="hidden" id="sell-product-id">
+      <p style="color:var(--text2);margin-bottom:16px;">Tem certeza que deseja marcar este produto como vendido? Ele
+        será movido para o histórico.</p>
+      <div class="form-group">
+        <label>Preço final de venda (R$)</label>
+        <input type="number" id="sell-final-price" placeholder="0,00" step="0.01">
+      </div>
+      <div class="form-actions">
+        <button class="btn btn-ghost" onclick="closeModal('modal-sell')">Cancelar</button>
+        <button class="btn btn-success" onclick="confirmSell()">✅ Confirmar Venda</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- CONFIGURAÇÕES LOJA -->
+  <div class="modal-overlay" id="modal-settings">
+    <div class="modal" style="max-width:440px;">
+      <button class="modal-close" onclick="closeModal('modal-settings')">✕</button>
+      <h2>⚙️ Configurações da Loja</h2>
+      <div class="form-group">
+        <label>Nome da Loja</label>
+        <input type="text" id="set-name" placeholder="Móveis & Cia">
+      </div>
+      <div class="form-group">
+        <label>Telefone de contato</label>
+        <input type="text" id="set-phone" placeholder="(00) 00000-0000">
+      </div>
+      <div class="form-group">
+        <label>E-mail de contato</label>
+        <input type="email" id="set-email" placeholder="contato@loja.com">
+      </div>
+      <div class="form-group">
+        <label>Alterar senha (deixe em branco para manter)</label>
+        <input type="password" id="set-pass" placeholder="Nova senha">
+      </div>
+      <div class="form-actions">
+        <button class="btn btn-ghost" onclick="closeModal('modal-settings')">Cancelar</button>
+        <button class="btn btn-primary" onclick="saveSettings()">💾 Salvar</button>
+      </div>
+    </div>
+  </div>
+  <script src="logica.js"></script>
+</body>
+
+</html>
