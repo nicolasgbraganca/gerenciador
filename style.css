@@ -159,11 +159,11 @@ body {
 }
 
 .btn {
-  padding: 10px 22px;
+  padding: 12px 20px;
   border: none;
   border-radius: 8px;
   font-family: 'DM Sans', sans-serif;
-  font-size: 14px;
+  font-size: 12px;
   font-weight: 600;
   cursor: pointer;
   transition: .2s;
@@ -438,7 +438,7 @@ body {
 
 .page-title {
   font-family: 'Playfair Display', serif;
-  font-size: 2rem;
+  font-size: 1.6rem;
   color: var(--wood-dark);
 }
 
@@ -755,15 +755,18 @@ tbody tr:hover {
 }
 
 /* ---- RESPONSIVE ---- */
-@media(max-width:768px) {
+/* ---- RESPONSIVE ---- */
+@media(max-width: 768px) {
   .sidebar {
     width: 60px;
   }
 
   .sidebar-logo,
-  .nav-section,
-  .nav-item span,
-  .sidebar-footer span {
+  .nav-section {
+    display: none;
+  }
+
+  .nav-item span:not(.icon) {
     display: none;
   }
 
@@ -771,6 +774,14 @@ tbody tr:hover {
     justify-content: center;
     padding: 12px;
     margin: 2px 4px;
+  }
+
+  .sidebar-footer .logout-btn span:not(.icon) {
+    display: none;
+  }
+
+  .logout-btn {
+    justify-content: center;
   }
 
   .main {
