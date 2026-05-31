@@ -342,6 +342,17 @@ body {
   z-index: 100;
 }
 
+.sidebar::after {
+  content: '';
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 60px;
+  height: 100px;
+  background: var(--wood-dark);
+  z-index: 99;
+}
+
 .sidebar-logo {
   padding: 28px 24px 20px;
   border-bottom: 1px solid rgba(255, 255, 255, .1);
