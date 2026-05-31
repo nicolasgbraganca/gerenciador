@@ -336,7 +336,7 @@ body {
   position: fixed;
   top: 0;
   left: 0;
-  height: 100%;
+  height: calc(100vh + 100px);
   display: flex;
   flex-direction: column;
   z-index: 100;
