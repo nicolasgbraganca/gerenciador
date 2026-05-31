@@ -330,21 +330,29 @@ body {
   display: none;
 }
 
+/* SIDEBAR — corrigida para Safari iOS */
 .sidebar {
   width: 240px;
   background: var(--wood-dark);
   position: fixed;
   top: 0;
   left: 0;
-  height: calc(var(--vh, 1vh) * 100);
+  height: 100%;
+  /* preenche o pai */
+  min-height: 100vh;
+  /* garante altura mínima */
   display: flex;
   flex-direction: column;
+  overflow-y: auto;
+  /* scroll interno se necessário */
   z-index: 100;
 }
 
 .sidebar-logo {
   padding: 28px 24px 20px;
   border-bottom: 1px solid rgba(255, 255, 255, .1);
+  flex-shrink: 0;
+  /* não encolhe */
 }
 
 .sidebar-logo h1 {
@@ -369,6 +377,7 @@ body {
   text-transform: uppercase;
   letter-spacing: 1px;
   color: rgba(255, 255, 255, .35);
+  flex-shrink: 0;
 }
 
 .nav-item {
@@ -384,6 +393,7 @@ body {
   font-weight: 500;
   transition: .15s;
   text-decoration: none;
+  flex-shrink: 0;
 }
 
 .nav-item:hover,
@@ -398,10 +408,16 @@ body {
   text-align: center;
 }
 
+/* SIDEBAR FOOTER — sticky no fundo */
 .sidebar-footer {
   margin-top: auto;
   padding: 16px;
   border-top: 1px solid rgba(255, 255, 255, .1);
+  flex-shrink: 0;
+  position: sticky;
+  bottom: 0;
+  background: var(--wood-dark);
+  /* cobre o conteúdo ao fazer scroll */
 }
 
 .logout-btn {
@@ -415,6 +431,7 @@ body {
   background: none;
   border: none;
   font-family: 'DM Sans', sans-serif;
+  width: 100%;
 }
 
 .logout-btn:hover {
@@ -760,7 +777,6 @@ tbody tr:hover {
   margin-bottom: 12px;
 }
 
-/* ---- RESPONSIVE ---- */
 /* ---- RESPONSIVE ---- */
 @media(max-width: 768px) {
   .sidebar {
