@@ -13,6 +13,12 @@ let STATE = {
 
 // ===================== BOOT =====================
 document.addEventListener('DOMContentLoaded', async () => {
+  // Corrige altura no Safari iOS
+  document.documentElement.style.setProperty('--vh', `${window.innerHeight * 0.01}px`);
+  window.addEventListener('resize', () => {
+    document.documentElement.style.setProperty('--vh', `${window.innerHeight * 0.01}px`);
+  });
+
   // Botão de configurações na sidebar
   document.querySelector('.sidebar-footer').innerHTML += `
     <button class="logout-btn" onclick="openSettingsModal()" style="margin-top:8px;">
@@ -158,7 +164,7 @@ function openProductModal() {
   STATE.editingProductId = null
   document.getElementById('modal-product-title').textContent = 'Novo Produto'
   document.getElementById('product-id').value = ''
-  ;['p-name', 'p-cost', 'p-price', 'p-desc'].forEach(id => document.getElementById(id).value = '')
+    ;['p-name', 'p-cost', 'p-price', 'p-desc'].forEach(id => document.getElementById(id).value = '')
   document.getElementById('p-room').value = ''
   document.getElementById('p-type').value = ''
   document.getElementById('img-preview-list').innerHTML = ''
@@ -278,11 +284,11 @@ function renderProductFilters() {
   const products = getAvailableProducts()
   const rooms = [...new Set(products.map(p => p.comodo))]
   const types = [...new Set(products.map(p => p.tipo))]
-  ;['filter-room', 'filter-catalog-room'].forEach(id => {
-    const el = document.getElementById(id); if (!el) return
-    const cur = el.value
-    el.innerHTML = '<option value="">Todos os cômodos</option>' + rooms.map(r => `<option ${r === cur ? 'selected' : ''}>${r}</option>`).join('')
-  });
+    ;['filter-room', 'filter-catalog-room'].forEach(id => {
+      const el = document.getElementById(id); if (!el) return
+      const cur = el.value
+      el.innerHTML = '<option value="">Todos os cômodos</option>' + rooms.map(r => `<option ${r === cur ? 'selected' : ''}>${r}</option>`).join('')
+    });
   ['filter-type', 'filter-catalog-type'].forEach(id => {
     const el = document.getElementById(id); if (!el) return
     const cur = el.value
@@ -396,7 +402,7 @@ function openPropose(productId) {
   STATE.currentProposalProductId = productId
   STATE.propSellImg = null
   const p = STATE.products.find(x => x.id === productId)
-  ;['prop-name', 'prop-phone', 'prop-email', 'prop-msg'].forEach(id => document.getElementById(id).value = '')
+    ;['prop-name', 'prop-phone', 'prop-email', 'prop-msg'].forEach(id => document.getElementById(id).value = '')
   document.getElementById('prop-type').value = 'compra'
   document.getElementById('prop-sell-desc').value = ''
   document.getElementById('prop-sell-value').value = ''
