@@ -245,6 +245,18 @@ function openSellModal(id) {
   openModal('modal-sell')
 }
 
+// ===================== GOOGLE SHEETS =====================
+async function enviarParaSheets(dados) {
+  try {
+    await fetch('https://script.google.com/macros/s/AKfycbwj3muZ5EMb732a2n8imLHlWgNhcJzOPr0EgsqT0q2v9Fl_PiPSjlDO9oqg9u72ushBew/exec', {
+      method: 'POST',
+      body: JSON.stringify(dados)
+    })
+  } catch (erro) {
+    console.error('Erro ao enviar para Sheets:', erro)
+  }
+}
+
 async function confirmSell() {
   const id = document.getElementById('sell-product-id').value
   const precoVenda = parseFloat(document.getElementById('sell-final-price').value)
@@ -274,6 +286,13 @@ async function confirmSell() {
   renderProducts()
   renderSold()
   updateStats()
+  // Envia para o Google Sheets
+  await enviarParaSheets({
+    produto: p.nome,
+    custo: p.custo,
+    precoVenda: precoVenda,
+    lucro: lucro
+  })
   toast(`Venda registrada! Lucro: R$ ${lucro.toFixed(2)} 💰`, 'success')
 }
 
