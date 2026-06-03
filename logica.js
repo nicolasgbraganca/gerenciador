@@ -5,7 +5,7 @@ const _supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY)
 
 // ===================== STATE =====================
 let STATE = {
-  products: [], soldProducts: [], proposals: [],
+  products: [], proposals: [],
   settings: { name: 'Pereira & Alem', phone: '', email: '' },
   tempImgs: [], propSellImg: null,
   editingProductId: null, currentProposalProductId: null,
@@ -14,10 +14,10 @@ let STATE = {
 // ===================== BOOT =====================
 document.addEventListener('DOMContentLoaded', async () => {
   // Corrige altura no Safari iOS
-  document.documentElement.style.setProperty('--vh', `${window.innerHeight * 0.01}px`);
+  document.documentElement.style.setProperty('--vh', `${window.innerHeight * 0.01}px`)
   window.addEventListener('resize', () => {
-    document.documentElement.style.setProperty('--vh', `${window.innerHeight * 0.01}px`);
-  });
+    document.documentElement.style.setProperty('--vh', `${window.innerHeight * 0.01}px`)
+  })
 
   // Botão de configurações na sidebar
   document.querySelector('.sidebar-footer').innerHTML += `
@@ -60,7 +60,6 @@ async function doLogin() {
 async function doLogout() {
   await _supabase.auth.signOut()
   STATE.products = []
-  STATE.soldProducts = []
   document.getElementById('app').style.display = 'none'
   document.getElementById('page-login').style.display = 'flex'
   document.getElementById('login-pass').value = ''
@@ -85,7 +84,6 @@ function showPage(name) {
   if (name === 'catalog') carregarProdutos().then(() => { renderCatalogFilters(); renderCatalog() })
   if (name === 'dashboard') carregarProdutos().then(() => { updateStats(); renderDashRecent() })
   if (name === 'products') carregarProdutos().then(() => { renderProductFilters(); renderProducts() })
-  if (name === 'sold') carregarVendas().then(renderSold)
 }
 
 // ===================== TOAST =====================
@@ -111,15 +109,6 @@ async function carregarProdutos() {
     .order('criado_em', { ascending: false })
   if (error) { toast('Erro ao carregar produtos', 'error'); return }
   STATE.products = data || []
-}
-
-async function carregarVendas() {
-  const { data, error } = await _supabase
-    .from('vendas')
-    .select('*')
-    .order('vendido_em', { ascending: false })
-  if (error) { toast('Erro ao carregar vendas', 'error'); return }
-  STATE.soldProducts = data || []
 }
 
 async function carregarPropostas(productId) {
@@ -283,11 +272,9 @@ async function confirmSell() {
 
   closeModal('modal-sell')
   await carregarProdutos()
-  await carregarVendas()
   renderProducts()
-  renderSold()
+  renderDashRecent()
   updateStats()
-  // Envia para o Google Sheets
   await enviarParaSheets({
     produto: p.nome,
     custo: p.custo,
@@ -388,32 +375,12 @@ function renderCatalog() {
     '<div class="empty-state"><div class="icon">🛋️</div><p>Nenhum produto disponível no momento</p></div>'
 }
 
-// ===================== SOLD =====================
-function renderSold() {
-  const tbody = document.getElementById('sold-list')
-  if (!STATE.soldProducts.length) {
-    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--text2);padding:32px;">Nenhuma venda registrada ainda</td></tr>'
-    return
-  }
-  tbody.innerHTML = STATE.soldProducts.map(p => `
-    <tr>
-      <td><b>${p.nome_produto}</b></td>
-      <td>${p.comodo || ''} / ${p.tipo || ''}</td>
-      <td>R$ ${parseFloat(p.custo).toFixed(2)}</td>
-      <td>R$ ${parseFloat(p.preco_venda).toFixed(2)}</td>
-      <td class="${p.lucro >= 0 ? 'profit-positive' : 'profit-negative'}">R$ ${parseFloat(p.lucro).toFixed(2)}</td>
-      <td>${new Date(p.vendido_em).toLocaleDateString('pt-BR')}</td>
-    </tr>`).join('')
-}
-
 // ===================== STATS =====================
 function updateStats() {
   const avail = getAvailableProducts()
-  const totalProfit = STATE.soldProducts.reduce((a, p) => a + (p.lucro || 0), 0)
   const invested = avail.reduce((a, p) => a + p.custo, 0)
   document.getElementById('stat-available').textContent = avail.length
-  document.getElementById('stat-profit').textContent = 'R$ ' + totalProfit.toFixed(2)
-  document.getElementById('stat-sold-count').textContent = STATE.soldProducts.length
+  document.getElementById('stat-sold-count').textContent = '—'
   document.getElementById('stat-invested').textContent = 'R$ ' + invested.toFixed(2)
 }
 

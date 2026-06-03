@@ -51,9 +51,6 @@
       <a class="nav-item" onclick="showPage('products')" data-page="products">
         <span class="icon">🛋️</span><span>Produtos</span>
       </a>
-      <a class="nav-item" onclick="showPage('sold')" data-page="sold">
-        <span class="icon">✅</span><span>Vendidos</span>
-      </a>
       <div class="nav-section">Público</div>
       <a class="nav-item" onclick="showPage('catalog')" data-page="catalog">
         <span class="icon">🏪</span><span>Catálogo</span>
@@ -81,10 +78,6 @@
           <div class="stat-card">
             <div class="stat-label">Produtos à venda</div>
             <div class="stat-value" id="stat-available">0</div>
-          </div>
-          <div class="stat-card green">
-            <div class="stat-label">Lucro total (vendidos)</div>
-            <div class="stat-value" id="stat-profit">R$ 0</div>
           </div>
           <div class="stat-card blue">
             <div class="stat-label">Total vendido</div>
@@ -120,31 +113,6 @@
           </select>
         </div>
         <div class="products-grid" id="products-list"></div>
-      </div>
-
-      <!-- VENDIDOS -->
-      <div class="page" id="page-sold">
-        <div class="page-header">
-          <div>
-            <div class="page-title">Histórico de Vendas</div>
-            <div class="page-subtitle">Produtos vendidos e lucros</div>
-          </div>
-        </div>
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th>Produto</th>
-                <th>Cômodo</th>
-                <th>Custo</th>
-                <th>Preço Venda</th>
-                <th>Lucro</th>
-                <th>Vendido em</th>
-              </tr>
-            </thead>
-            <tbody id="sold-list"></tbody>
-          </table>
-        </div>
       </div>
 
       <!-- CATÁLOGO PÚBLICO -->
