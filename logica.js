@@ -111,6 +111,21 @@ async function carregarProdutos() {
   STATE.products = data || []
 }
 
+async function carregarVendasMes() {
+  const agora = new Date()
+  const inicioMes = new Date(agora.getFullYear(), agora.getMonth(), 1).toISOString()
+  const fimMes = new Date(agora.getFullYear(), agora.getMonth() + 1, 0, 23, 59, 59).toISOString()
+
+  const { data, error } = await _supabase
+    .from('vendas')
+    .select('id')
+    .gte('vendido_em', inicioMes)
+    .lte('vendido_em', fimMes)
+
+  if (error) { toast('Erro ao carregar vendas', 'error'); return 0 }
+  return data?.length || 0
+}
+
 async function carregarPropostas(productId) {
   const { data, error } = await _supabase
     .from('propostas')
@@ -376,11 +391,13 @@ function renderCatalog() {
 }
 
 // ===================== STATS =====================
-function updateStats() {
+async function updateStats() {
   const avail = getAvailableProducts()
   const invested = avail.reduce((a, p) => a + p.custo, 0)
+  const totalVendidoMes = await carregarVendasMes()
+
   document.getElementById('stat-available').textContent = avail.length
-  document.getElementById('stat-sold-count').textContent = '—'
+  document.getElementById('stat-sold-count').textContent = totalVendidoMes
   document.getElementById('stat-invested').textContent = 'R$ ' + invested.toFixed(2)
 }
 
