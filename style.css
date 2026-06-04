@@ -337,14 +337,9 @@ body {
   position: fixed;
   top: 0;
   left: 0;
-  height: 100%;
-  /* preenche o pai */
-  min-height: 100vh;
-  /* garante altura mínima */
+  height: 100vh;
   display: flex;
   flex-direction: column;
-  overflow-y: auto;
-  /* scroll interno se necessário */
   z-index: 100;
 }
 
@@ -414,10 +409,7 @@ body {
   padding: 16px;
   border-top: 1px solid rgba(255, 255, 255, .1);
   flex-shrink: 0;
-  position: sticky;
-  bottom: 0;
   background: var(--wood-dark);
-  /* cobre o conteúdo ao fazer scroll */
 }
 
 .logout-btn {
