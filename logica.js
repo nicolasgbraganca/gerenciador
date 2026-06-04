@@ -83,7 +83,7 @@ function showPage(name) {
 
   if (name === 'catalog') carregarProdutos().then(() => { renderCatalogFilters(); renderCatalog() })
   if (name === 'dashboard') carregarProdutos().then(() => { updateStats(); renderDashRecent() })
-  if (name === 'products') carregarProdutos().then(() => { renderProductFilters(); renderProducts() })
+  if (name === 'products') carregarProdutos().then(renderProducts)
 }
 
 // ===================== TOAST =====================
@@ -169,21 +169,17 @@ function openProductModal() {
   document.getElementById('modal-product-title').textContent = 'Novo Produto'
   document.getElementById('product-id').value = ''
     ;['p-name', 'p-cost', 'p-price', 'p-desc'].forEach(id => document.getElementById(id).value = '')
-  document.getElementById('p-room').value = ''
-  document.getElementById('p-type').value = ''
   document.getElementById('img-preview-list').innerHTML = ''
   openModal('modal-product')
 }
 
 async function saveProduct() {
   const nome = document.getElementById('p-name').value.trim()
-  const comodo = document.getElementById('p-room').value
-  const tipo = document.getElementById('p-type').value
   const custo = parseFloat(document.getElementById('p-cost').value)
   const preco = parseFloat(document.getElementById('p-price').value)
   const descricao = document.getElementById('p-desc').value.trim()
 
-  if (!nome || !comodo || !tipo || isNaN(custo) || isNaN(preco)) {
+  if (!nome || isNaN(custo) || isNaN(preco)) {
     toast('Preencha todos os campos obrigatórios (*)', 'error'); return
   }
   if (STATE.tempImgs.length === 0 && !STATE.editingProductId) {
@@ -193,14 +189,14 @@ async function saveProduct() {
   const editId = document.getElementById('product-id').value
 
   if (editId) {
-    const atualizacao = { nome, comodo, tipo, custo, preco, descricao }
+    const atualizacao = { nome, custo, preco, descricao }
     if (STATE.tempImgs.length) atualizacao.fotos = STATE.tempImgs
     const { error } = await _supabase.from('produtos').update(atualizacao).eq('id', editId)
     if (error) { toast('Erro ao atualizar produto', 'error'); return }
     toast('Produto atualizado!', 'success')
   } else {
     const { error } = await _supabase.from('produtos').insert({
-      nome, comodo, tipo, custo, preco, descricao, fotos: STATE.tempImgs, vendido: false
+      nome, custo, preco, descricao, fotos: STATE.tempImgs, vendido: false
     })
     if (error) { toast('Erro ao cadastrar produto', 'error'); return }
     toast('Produto cadastrado! 🎉', 'success')
@@ -222,8 +218,6 @@ function editProduct(id) {
   document.getElementById('modal-product-title').textContent = 'Editar Produto'
   document.getElementById('product-id').value = id
   document.getElementById('p-name').value = p.nome
-  document.getElementById('p-room').value = p.comodo
-  document.getElementById('p-type').value = p.tipo
   document.getElementById('p-cost').value = p.custo
   document.getElementById('p-price').value = p.preco
   document.getElementById('p-desc').value = p.descricao || ''
@@ -273,8 +267,6 @@ async function confirmSell() {
   const { error: erroVenda } = await _supabase.from('vendas').insert({
     produto_id: p.id,
     nome_produto: p.nome,
-    comodo: p.comodo,
-    tipo: p.tipo,
     custo: p.custo,
     preco_sugerido: p.preco,
     preco_venda: precoVenda,
@@ -302,30 +294,11 @@ async function confirmSell() {
 // ===================== RENDER =====================
 function getAvailableProducts() { return STATE.products.filter(p => !p.vendido) }
 
-function renderProductFilters() {
-  const products = getAvailableProducts()
-  const rooms = [...new Set(products.map(p => p.comodo))]
-  const types = [...new Set(products.map(p => p.tipo))]
-    ;['filter-room', 'filter-catalog-room'].forEach(id => {
-      const el = document.getElementById(id); if (!el) return
-      const cur = el.value
-      el.innerHTML = '<option value="">Todos os cômodos</option>' + rooms.map(r => `<option ${r === cur ? 'selected' : ''}>${r}</option>`).join('')
-    });
-  ['filter-type', 'filter-catalog-type'].forEach(id => {
-    const el = document.getElementById(id); if (!el) return
-    const cur = el.value
-    el.innerHTML = '<option value="">Todos os tipos</option>' + types.map(t => `<option ${t === cur ? 'selected' : ''}>${t}</option>`).join('')
-  })
-}
-
-function getFilteredProducts(searchId, roomId, typeId) {
+function getFilteredProducts(searchId) {
   const q = (document.getElementById(searchId)?.value || '').toLowerCase()
-  const room = document.getElementById(roomId)?.value || ''
-  const type = document.getElementById(typeId)?.value || ''
-  return getAvailableProducts().filter(p => {
-    const matchQ = !q || p.nome.toLowerCase().includes(q) || (p.descricao || '').toLowerCase().includes(q)
-    return matchQ && (!room || p.comodo === room) && (!type || p.tipo === type)
-  })
+  return getAvailableProducts().filter(p =>
+    !q || p.nome.toLowerCase().includes(q) || (p.descricao || '').toLowerCase().includes(q)
+  )
 }
 
 function productCard(p, isAdmin) {
@@ -343,8 +316,6 @@ function productCard(p, isAdmin) {
       <div class="product-img">${img}</div>
       <div class="product-body">
         <div class="product-badges">
-          <span class="badge badge-room">${p.comodo}</span>
-          <span class="badge badge-type">${p.tipo}</span>
           <span class="badge badge-available">Disponível</span>
         </div>
         <div class="product-name">${p.nome}</div>
@@ -357,8 +328,7 @@ function productCard(p, isAdmin) {
 }
 
 function renderProducts() {
-  renderProductFilters()
-  const list = getFilteredProducts('search-products', 'filter-room', 'filter-type')
+  const list = getFilteredProducts('search-products')
   const el = document.getElementById('products-list')
   el.innerHTML = list.length ? list.map(p => productCard(p, true)).join('') :
     '<div class="empty-state"><div class="icon">📦</div><p>Nenhum produto encontrado</p></div>'
@@ -372,7 +342,6 @@ function renderDashRecent() {
 }
 
 function renderCatalogFilters() {
-  renderProductFilters()
   const s = STATE.settings
   const info = document.getElementById('catalog-contact-info')
   if (info) {
@@ -384,7 +353,7 @@ function renderCatalogFilters() {
 }
 
 function renderCatalog() {
-  const list = getFilteredProducts('search-catalog', 'filter-catalog-room', 'filter-catalog-type')
+  const list = getFilteredProducts('search-catalog')
   const el = document.getElementById('catalog-list')
   el.innerHTML = list.length ? list.map(p => productCard(p, false)).join('') :
     '<div class="empty-state"><div class="icon">🛋️</div><p>Nenhum produto disponível no momento</p></div>'
@@ -415,7 +384,7 @@ function openPropose(productId) {
   const info = document.getElementById('propose-product-info')
   if (p) {
     const img = p.fotos && p.fotos[0] ? `<img src="${p.fotos[0]}" style="width:60px;height:60px;object-fit:cover;border-radius:8px;float:left;margin-right:12px;">` : '🛋️'
-    info.innerHTML = `${img}<b>${p.nome}</b><br><span style="color:var(--text2)">${p.comodo} • ${p.tipo}</span><br><b style="color:var(--accent)">R$ ${parseFloat(p.preco).toFixed(2)}</b>`
+    info.innerHTML = `${img}<b>${p.nome}</b><br><b style="color:var(--accent)">R$ ${parseFloat(p.preco).toFixed(2)}</b>`
   }
   openModal('modal-propose')
 }
@@ -469,8 +438,6 @@ async function viewProductDetail(id) {
     <h2 style="font-family:'Playfair Display',serif;color:var(--wood-dark);">${p.nome}</h2>
     <div style="display:flex;gap:8px;flex-wrap:wrap;margin:12px 0;">${imgs}</div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:16px 0;">
-      <div><b>Cômodo:</b> ${p.comodo}</div>
-      <div><b>Tipo:</b> ${p.tipo}</div>
       <div><b>Custo:</b> R$ ${parseFloat(p.custo).toFixed(2)}</div>
       <div><b>Preço sugerido:</b> R$ ${parseFloat(p.preco).toFixed(2)}</div>
       <div><b>Lucro prev.:</b> <span style="color:var(--success);font-weight:700">R$ ${(p.preco - p.custo).toFixed(2)}</span></div>

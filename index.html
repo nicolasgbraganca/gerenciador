@@ -104,13 +104,8 @@
           <button class="btn btn-primary" onclick="openModal('modal-product')">+ Novo Produto</button>
         </div>
         <div class="filter-bar">
-          <input type="text" id="search-products" placeholder="🔍 Buscar produto..." oninput="renderProducts()">
-          <select id="filter-room" onchange="renderProducts()">
-            <option value="">Todos os cômodos</option>
-          </select>
-          <select id="filter-type" onchange="renderProducts()">
-            <option value="">Todos os tipos</option>
-          </select>
+          <input type="text" id="search-products" placeholder="🔍 Buscar produto..." oninput="renderProducts()"
+            onkeydown="if(event.key==='Enter')renderProducts()">
         </div>
         <div class="products-grid" id="products-list"></div>
       </div>
@@ -118,18 +113,13 @@
       <!-- CATÁLOGO PÚBLICO -->
       <div class="page" id="page-catalog">
         <div class="catalog-header">
-          <h1>🛋️ Móveis & Cia</h1>
+          <h1>🛋️ Pereira & Alem</h1>
           <p>Móveis usados com qualidade e história</p>
           <div class="catalog-contact" id="catalog-contact-info"></div>
         </div>
         <div class="filter-bar">
-          <input type="text" id="search-catalog" placeholder="🔍 Buscar móvel..." oninput="renderCatalog()">
-          <select id="filter-catalog-room" onchange="renderCatalog()">
-            <option value="">Todos os cômodos</option>
-          </select>
-          <select id="filter-catalog-type" onchange="renderCatalog()">
-            <option value="">Todos os tipos</option>
-          </select>
+          <input type="text" id="search-catalog" placeholder="🔍 Buscar móvel..." oninput="renderCatalog()"
+            onkeydown="if(event.key==='Enter')renderCatalog()">
         </div>
         <div class="products-grid" id="catalog-list"></div>
         <!-- Formulário de proposta -->
@@ -153,39 +143,6 @@
       <div class="form-group">
         <label>Nome do Produto *</label>
         <input type="text" id="p-name" placeholder="Ex: Sofá 3 lugares retrô">
-      </div>
-      <div class="form-row">
-        <div class="form-group">
-          <label>Cômodo *</label>
-          <select id="p-room">
-            <option value="">Selecione...</option>
-            <option>Sala</option>
-            <option>Quarto</option>
-            <option>Cozinha</option>
-            <option>Escritório</option>
-            <option>Área externa</option>
-            <option>Banheiro</option>
-            <option>Outro</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label>Tipo *</label>
-          <select id="p-type">
-            <option value="">Selecione...</option>
-            <option>Sofá</option>
-            <option>Mesa</option>
-            <option>Cadeira</option>
-            <option>Guarda-roupa</option>
-            <option>Cama</option>
-            <option>Estante</option>
-            <option>Armário</option>
-            <option>Poltrona</option>
-            <option>Rack / Painel</option>
-            <option>Penteadeira</option>
-            <option>Escrivaninha</option>
-            <option>Outro</option>
-          </select>
-        </div>
       </div>
       <div class="form-row">
         <div class="form-group">
