@@ -245,6 +245,7 @@ function openSellModal(id) {
 
 // ===================== GOOGLE SHEETS =====================
 async function enviarParaSheets(dados) {
+  console.log('Enviando para Sheets:', dados)
   try {
     await fetch('https://script.google.com/macros/s/AKfycbwj3muZ5EMb732a2n8imLHlWgNhcJzOPr0EgsqT0q2v9Fl_PiPSjlDO9oqg9u72ushBew/exec', {
       method: 'POST',
