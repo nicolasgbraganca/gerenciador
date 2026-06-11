@@ -258,6 +258,7 @@ async function enviarParaSheets(dados) {
 }
 
 async function confirmSell() {
+  console.log('confirmSell chamado!')
   const id = document.getElementById('sell-product-id').value
   const precoVenda = parseFloat(document.getElementById('sell-final-price').value)
   const p = STATE.products.find(x => x.id === id)
