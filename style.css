@@ -263,6 +263,9 @@ body {
   border: 2px solid var(--border);
 }
 
+.img-thumb-wrap { position: relative; width: 72px; height: 72px; }
+.img-thumb-wrap button { position: absolute; top: -7px; right: -7px; border: 0; border-radius: 50%; width: 22px; height: 22px; cursor: pointer; background: var(--danger); color: white; }
+
 /* ========== LOGIN ========== */
 #page-login {
   display: flex;
@@ -756,6 +759,10 @@ tbody tr:hover {
   color: var(--danger);
   font-weight: 700;
 }
+
+.stat-card.green { border-color: var(--success); }
+.table-wrap { overflow-x: auto; }
+.sale-cancelled { opacity: .55; text-decoration: line-through; }
 
 /* ---- EMPTY STATE ---- */
 .empty-state {

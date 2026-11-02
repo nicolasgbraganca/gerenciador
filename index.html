@@ -22,7 +22,7 @@
       <div class="login-logo">Pereira<span> & </span>Alem</div>
       <p class="login-sub">Sistema de Gestão</p>
       <div class="form-group">
-        <label>E-mail</E-mail></label>
+        <label for="login-user">E-mail</label>
         <input type="email" id="login-user" placeholder="seu@email.com" />
       </div>
       <div class="form-group">
@@ -31,7 +31,7 @@
       </div>
       <button class="btn btn-primary" onclick="doLogin()">Entrar</button>
       <div class="login-nav" style="margin-top:24px;">
-        <a onclick="showPage('catalog')">Ver catálogo público →</a>
+          <a onclick="showPublicCatalog()">Ver catálogo público →</a>
       </div>
     </div>
   </div>
@@ -50,6 +50,12 @@
       </a>
       <a class="nav-item" onclick="showPage('products')" data-page="products">
         <span class="icon">🛋️</span><span>Produtos</span>
+      </a>
+      <a class="nav-item" onclick="showPage('sales')" data-page="sales">
+        <span class="icon">🧾</span><span>Vendas</span>
+      </a>
+      <a class="nav-item" onclick="showPage('expenses')" data-page="expenses">
+        <span class="icon">💸</span><span>Despesas</span>
       </a>
       <div class="nav-section">Público</div>
       <a class="nav-item" onclick="showPage('catalog')" data-page="catalog">
@@ -80,7 +86,7 @@
             <div class="stat-value" id="stat-available">0</div>
           </div>
           <div class="stat-card blue">
-            <div class="stat-label">Total vendido</div>
+            <div class="stat-label">Vendas neste mês</div>
             <div class="stat-value" id="stat-sold-count">0</div>
           </div>
           <div class="stat-card red">
@@ -88,10 +94,26 @@
             <div class="stat-value" id="stat-invested">R$ 0</div>
           </div>
         </div>
+        <div class="stats-grid">
+          <div class="stat-card green"><div class="stat-label">Entradas neste mês</div><div class="stat-value" id="stat-revenue">R$ 0,00</div></div>
+          <div class="stat-card blue"><div class="stat-label">Lucro bruto neste mês</div><div class="stat-value" id="stat-profit">R$ 0,00</div></div>
+          <div class="stat-card red"><div class="stat-label">Despesas neste mês</div><div class="stat-value" id="stat-expenses">R$ 0,00</div></div>
+        </div>
         <div class="page-header" style="margin-top:8px;">
           <div class="page-title" style="font-size:1.3rem;">Produtos Recentes</div>
         </div>
         <div class="products-grid" id="dash-recent"></div>
+      </div>
+
+      <div class="page" id="page-sales">
+        <div class="page-header"><div><div class="page-title">Histórico de vendas</div><div class="page-subtitle">Vendas registradas e lucro bruto</div></div><button class="btn btn-ghost" onclick="exportCsv('sales')">⬇ Exportar CSV</button></div>
+        <div id="sales-list"></div>
+      </div>
+
+      <div class="page" id="page-expenses">
+        <div class="page-header"><div><div class="page-title">Despesas</div><div class="page-subtitle">Custos da loja além da compra dos produtos</div></div><button class="btn btn-primary" onclick="openExpenseModal()">+ Nova despesa</button></div>
+        <div class="filter-bar"><button class="btn btn-ghost" onclick="exportCsv('expenses')">⬇ Exportar CSV</button></div>
+        <div id="expenses-list"></div>
       </div>
 
       <!-- PRODUTOS -->
@@ -123,10 +145,7 @@
         </div>
         <div class="products-grid" id="catalog-list"></div>
         <!-- Formulário de proposta -->
-        <div id="no-catalog-login" style="display:none; text-align:center; margin-top:20px;">
-          <a onclick="showLoginFromCatalog()" style="color:var(--wood); cursor:pointer; font-weight:600;">Área
-            administrativa →</a>
-        </div>
+        <div style="text-align:center;margin-top:24px;"><a onclick="showLoginFromCatalog()" style="color:var(--wood);cursor:pointer;font-weight:600;">Área administrativa →</a></div>
       </div>
 
     </main>
@@ -266,6 +285,17 @@
         <button class="btn btn-ghost" onclick="closeModal('modal-sell')">Cancelar</button>
         <button class="btn btn-success" onclick="confirmSell()">✅ Confirmar Venda</button>
       </div>
+    </div>
+  </div>
+
+  <!-- CONFIGURAÇÕES LOJA -->
+  <div class="modal-overlay" id="modal-expense">
+    <div class="modal" style="max-width:440px;">
+      <button class="modal-close" onclick="closeModal('modal-expense')">✕</button>
+      <h2>Registrar despesa</h2>
+      <div class="form-group"><label for="expense-description">Descrição *</label><input id="expense-description" type="text" placeholder="Ex.: transporte, reforma"></div>
+      <div class="form-row"><div class="form-group"><label for="expense-amount">Valor (R$) *</label><input id="expense-amount" type="number" min="0.01" step="0.01"></div><div class="form-group"><label for="expense-date">Data</label><input id="expense-date" type="date"></div></div>
+      <div class="form-actions"><button class="btn btn-ghost" onclick="closeModal('modal-expense')">Cancelar</button><button class="btn btn-primary" onclick="saveExpense()">Salvar despesa</button></div>
     </div>
   </div>
 
